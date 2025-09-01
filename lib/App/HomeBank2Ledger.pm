@@ -331,16 +331,29 @@ sub convert_homebank_to_ledger {
             my $paired_date  = $paired_transaction && $paired_transaction->{date};
             my $paired_payee = $homebank->find_payee_by_key($paired_transaction->{payee});
 
-            push @postings, {
+            my $dst_currency = $commodities{$dst_account->{currency}};
+            my $dst_amount = $paired_transaction->{amount} || -$transaction->{amount};
+            my $posting_data = {
                 date        => $paired_date,
                 account     => $dst_account->{ledger_name},
-                amount      => $paired_transaction->{amount} || -$transaction->{amount},
-                commodity   => $commodities{$dst_account->{currency}},
+                amount      => $dst_amount,
+                commodity   => $dst_currency,
                 payee       => $paired_payee->{name},
                 note        => $paired_transaction->{wording} || '',
                 status      => $STATUS_SYMBOLS{$paired_transaction->{status} || ''} || $status,
                 tags        => _split_tags($paired_transaction->{tags}),
             };
+            # Add price information for currency exchanges using damt field
+            my $src_currency = $commodities{$account->{currency}};
+            if ($src_currency->{iso} ne $dst_currency->{iso} && defined $transaction->{damt}) {
+                # Use the damt field which contains the amount in destination currency
+                # For @@ syntax (total cost), we use the absolute value of damt
+                $postings[0]{total_cost} = {
+                    amount      => abs($transaction->{damt}),
+                    commodity   => $dst_currency,
+                };
+            }
+            push @postings, $posting_data;
         }
         elsif ($transaction->{flags}{split}) {
             my @amounts     = split(/\|\|/, $transaction->{split_amount}   || '');
