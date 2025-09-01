@@ -24,7 +24,7 @@ our $VERSION = '9999.999'; # VERSION
 
 my %ACCOUNT_TYPES = (   # map HomeBank account types to Ledger accounts
     bank        => 'Assets',
-    cash        => 'Assets:Cash',
+    cash        => 'Assets',
     asset       => 'Assets',
     creditcard  => 'Liabilities',
     liability   => 'Liabilities',
