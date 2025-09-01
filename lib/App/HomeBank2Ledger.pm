@@ -23,13 +23,13 @@ use Pod::Usage;
 our $VERSION = '9999.999'; # VERSION
 
 my %ACCOUNT_TYPES = (   # map HomeBank account types to Ledger accounts
-    bank        => 'Assets:Bank',
+    bank        => 'Assets',
     cash        => 'Assets:Cash',
-    asset       => 'Assets:Fixed Assets',
-    creditcard  => 'Liabilities:Credit Card',
+    asset       => 'Assets',
+    creditcard  => 'Liabilities',
     liability   => 'Liabilities',
-    stock       => 'Assets:Stock',
-    mutualfund  => 'Assets:Mutual Fund',
+    stock       => 'Assets',
+    mutualfund  => 'Assets',
     income      => 'Income',
     expense     => 'Expenses',
     equity      => 'Equity',
