@@ -95,9 +95,27 @@ sub format_accounts {
     for my $account (sort @{$ledger->accounts}) {
         my $oldest_transaction = $self->_find_oldest_transaction_by_account($account, $ledger);
         my $account_date = $oldest_transaction->{date} || $UNKNOWN_DATE;
-        $account = $self->_format_account($account);
+        my $formatted_account = $self->_format_account($account);
 
-        push @out, "${account_date} open ${account}";
+        push @out, "${account_date} open ${formatted_account}";
+
+        # Add metadata if available and this is a real account (not generated ones)
+        if ($self->{account_mapping} && $self->{account_mapping}->{$account}) {
+            my $hb_account = $self->{account_mapping}->{$account};
+            my %metadata_map = (
+                bank_name => 'institution',
+                number    => 'number',
+                notes     => 'notes',
+            );
+
+            for my $hb_key (qw(bank_name number notes)) {
+                my $beancount_key = $metadata_map{$hb_key};
+                if (defined $hb_account->{$hb_key} && $hb_account->{$hb_key} ne '') {
+                    my $value = $self->_format_string($hb_account->{$hb_key});
+                    push @out, "    ${beancount_key}: ${value}";
+                }
+            }
+        }
     }
     push @out, '';
 

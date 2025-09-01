@@ -102,12 +102,25 @@ sub formatter {
     my $homebank = shift;
     my $opts     = shift || {};
 
-    return App::HomeBank2Ledger::Formatter->new(
+    my $formatter = App::HomeBank2Ledger::Formatter->new(
         type            => $opts->{format},
         account_width   => $opts->{account_width},
         name            => $homebank->title,
         file            => $homebank->file,
     );
+
+    # Add homebank reference for Beancount formatter to access metadata
+    if (lc($opts->{format}) eq 'beancount') {
+        # Create a mapping from ledger names to homebank accounts
+        my %account_mapping;
+        for my $account (@{$homebank->accounts}) {
+            my $type = $ACCOUNT_TYPES{$account->{type}} || $UNKNOWN_ACCOUNT;
+            my $ledger_name = "${type}:$account->{name}";
+            $account_mapping{$ledger_name} = $account;
+        }
+        $formatter->{account_mapping} = \%account_mapping;
+    }
+    return $formatter;
 }
 
 =method convert_homebank_to_ledger
