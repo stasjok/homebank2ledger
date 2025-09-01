@@ -282,7 +282,7 @@ sub _format_amount {
     $fraction ||= 0;
 
     # beancount doesn't support different notations
-    my $num = commify($whole);
+    my $num = $whole;
     if ($commodity->{frac}) {
         $num .= ".$fraction";
     }
