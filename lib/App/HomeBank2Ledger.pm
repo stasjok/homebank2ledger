@@ -367,8 +367,7 @@ sub convert_homebank_to_ledger {
                 my $other_account   = $category   ? $category->{ledger_name}
                                     : $amount < 0 ? $default_account_income
                                     :               $default_account_expenses;
-
-                push @postings, {
+                my $posting = {
                     account     => $other_account,
                     commodity   => $commodities{$account->{currency}},
                     amount      => $amount,
@@ -377,6 +376,11 @@ sub convert_homebank_to_ledger {
                     status      => $status,
                     tags        => $tags,
                 };
+                # Add memo metadata for Beancount format when memo is not empty
+                if ($memo && lc($opts->{format}) eq 'beancount') {
+                    $posting->{metadata} = { memo => $memo };
+                }
+                push @postings, $posting;
             }
         }
         else {  # normal transaction with or without category

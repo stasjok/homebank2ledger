@@ -202,7 +202,7 @@ sub _format_transaction {
     for my $key (sort keys %$metadata) {
         my $value = looks_like_number($metadata->{$key}) ? $metadata->{$key}
                                                          : $self->_format_string($metadata->{$key});
-        push @out, "    ; ${key}: ${value}";
+        push @out, "    ${key}: ${value}";
     }
 
     for my $posting (@postings) {
@@ -247,7 +247,7 @@ sub _format_transaction {
         for my $key (sort keys %$metadata) {
             my $value = looks_like_number($metadata->{$key}) ? $metadata->{$key}
                                                              : $self->_format_string($metadata->{$key});
-            push @out, "      ; ${key}: ${value}";
+            push @out, "        ${key}: ${value}";
         }
     }
 
